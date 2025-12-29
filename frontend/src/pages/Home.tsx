@@ -46,27 +46,37 @@ export default function Home() {
           </div>
         )}
 
+        {/* Quick Actions */}
+        <div className="text-center mb-16">
+          <button
+            onClick={() => navigate('/meal-planner')}
+            className="px-8 py-4 bg-secondary text-white rounded-lg font-bold text-lg hover:bg-secondary/90 transition-all transform hover:scale-105 shadow-lg"
+          >
+            🍽️ Plan a 3-Course Meal
+          </button>
+        </div>
+
         {/* Features */}
         <div className="grid md:grid-cols-3 gap-8 mt-16">
-          <div className="text-center p-6">
+          <div className="text-center p-6 hover:scale-105 transition-transform">
             <div className="text-4xl mb-4">🎨</div>
-            <h3 className="text-xl font-bold mb-2">Vibe-Based Search</h3>
-            <p className="text-gray-600">
+            <h3 className="text-xl font-bold mb-2 dark:text-white">Vibe-Based Search</h3>
+            <p className="text-gray-600 dark:text-gray-300">
               Describe your mood and we'll find recipes that match your emotional craving
             </p>
           </div>
-          <div className="text-center p-6">
+          <div className="text-center p-6 hover:scale-105 transition-transform">
             <div className="text-4xl mb-4">🤖</div>
-            <h3 className="text-xl font-bold mb-2">AI-Powered Matching</h3>
-            <p className="text-gray-600">
+            <h3 className="text-xl font-bold mb-2 dark:text-white">AI-Powered Matching</h3>
+            <p className="text-gray-600 dark:text-gray-300">
               Our AI understands flavor profiles and emotional contexts to find your perfect match
             </p>
           </div>
-          <div className="text-center p-6">
+          <div className="text-center p-6 hover:scale-105 transition-transform">
             <div className="text-4xl mb-4">📚</div>
-            <h3 className="text-xl font-bold mb-2">Your Recipe Collection</h3>
-            <p className="text-gray-600">
-              Add recipes from URLs or PDFs and build your personalized vibe library
+            <h3 className="text-xl font-bold mb-2 dark:text-white">Smart Features</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Ingredient substitutes, meal planning, and shopping lists powered by AI
             </p>
           </div>
         </div>

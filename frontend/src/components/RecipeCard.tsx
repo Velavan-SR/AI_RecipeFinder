@@ -17,14 +17,14 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   return (
     <div
       onClick={() => navigate(`/recipe/${recipe._id}`)}
-      className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer p-6 border-2 border-transparent hover:border-primary"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer p-6 border-2 border-transparent hover:border-primary hover:scale-105 transform"
     >
       {/* Vibe Match Score */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-800">{recipe.title}</h3>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white">{recipe.title}</h3>
         <div className="flex flex-col items-end">
-          <span className="text-2xl font-bold text-primary">{recipe.vibeMatch}%</span>
-          <span className="text-xs text-gray-500">Vibe Match</span>
+          <span className="text-2xl font-bold text-primary animate-pulse">{recipe.vibeMatch}%</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Vibe Match</span>
         </div>
       </div>
 
@@ -64,7 +64,16 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
       )}
 
       {/* Flavor Profile */}
-      <p className="text-gray-600 text-sm line-clamp-2">{recipe.flavorProfile}</p>
+      <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">{recipe.flavorProfile}</p>
+      
+      {/* Match Explanation */}
+      {recipe.matchExplanation && (
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-700 dark:text-gray-300 italic">
+            "{recipe.matchExplanation}"
+          </p>
+        </div>
+      )}
     </div>
   );
 }
