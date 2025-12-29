@@ -1,6 +1,6 @@
 import express from 'express';
 import { scrapeRecipeFromURL, extractRecipeFromPDF } from '../services/scraperService.js';
-import { generateVibeTags, generateRecipeEmbedding } from '../services/openaiService.js';
+import { generateVibeTags, generateRecipeEmbedding, generateMatchExplanation } from '../services/openaiService.js';
 import { createRecipe, findRecipeById, vectorSearch, getRecipesCollection } from '../models/Recipe.js';
 import { generateEmbedding } from '../services/openaiService.js';
 
@@ -66,11 +66,17 @@ router.post('/search', async (req, res) => {
     // Perform vector search
     const results = await vectorSearch(queryEmbedding, 10);
 
-    // Convert score to vibe match percentage
-    const recipesWithVibeMatch = results.map(recipe => ({
-      ...recipe,
-      vibeMatch: Math.round(recipe.score * 100)
-    }));
+    // Convert score to vibe match percentage and add explanations
+    const recipesWithVibeMatch = await Promise.all(
+      results.map(async (recipe) => {
+        const explanation = await generateMatchExplanation(query, recipe);
+        return {
+          ...recipe,
+          vibeMatch: Math.round(recipe.score * 100),
+          matchExplanation: explanation
+        };
+      })
+    );
 
     res.json({
       query,

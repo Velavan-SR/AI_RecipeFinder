@@ -7,6 +7,7 @@ interface RecipeCardProps {
     vibeTags: string[];
     flavorProfile: string;
     vibeMatch: number;
+    matchExplanation?: string;
   };
 }
 
@@ -51,6 +52,16 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           </span>
         )}
       </div>
+
+      {/* Match Explanation */}
+      {recipe.matchExplanation && (
+        <div className="mb-3 p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
+          <p className="text-sm text-gray-700 italic">
+            <span className="font-semibold text-primary">Why this match: </span>
+            {recipe.matchExplanation}
+          </p>
+        </div>
+      )}
 
       {/* Flavor Profile */}
       <p className="text-gray-600 text-sm line-clamp-2">{recipe.flavorProfile}</p>

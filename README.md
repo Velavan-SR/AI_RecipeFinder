@@ -21,13 +21,13 @@ Traditional recipe apps are limited to ingredients. **Vibe Finder** uses "Concep
 
 ### **Day 1: Foundation & Setup** (4 hours)
 
-#### Hour 1: Project Setup & Architecture Planning
-- [ ] Initialize React + TypeScript project (Vite recommended)
-- [ ] Install core dependencies:
+#### Hour 1: Project Setup & Architecture Planning ✅ COMPLETE
+- [x] Initialize React + TypeScript project (Vite recommended)
+- [x] Install core dependencies:
   - MongoDB Atlas SDK / Mongoose
   - OpenAI SDK (for embeddings & LLM)
   - React Router, TailwindCSS/shadcn
-- [ ] Design MongoDB schema:
+- [x] Design MongoDB schema:
   ```javascript
   {
     _id: ObjectId,
@@ -41,19 +41,19 @@ Traditional recipe apps are limited to ingredients. **Vibe Finder** uses "Concep
     createdAt: Date
   }
   ```
-- [ ] Set up MongoDB Atlas cluster with Vector Search index
+- [x] Set up MongoDB Atlas cluster with Vector Search index
 
-#### Hour 2: Backend API Foundation (Node.js/Express)
-- [ ] Create Express server with basic routes:
+#### Hour 2: Backend API Foundation (Node.js/Express) ✅ COMPLETE
+- [x] Create Express server with basic routes:
   - `POST /api/recipes/scrape` - Handle URL/PDF input
   - `POST /api/recipes/search` - Mood-based search endpoint
   - `GET /api/recipes/:id` - Get single recipe
-- [ ] Implement URL scraping logic (using Cheerio or Puppeteer)
-- [ ] Set up OpenAI API integration for embeddings
-- [ ] Test basic recipe ingestion flow
+- [x] Implement URL scraping logic (using Cheerio or Puppeteer)
+- [x] Set up OpenAI API integration for embeddings
+- [x] Test basic recipe ingestion flow
 
-#### Hour 3: LLM Flavor Profiling System
-- [ ] Create prompt template for generating vibe tags:
+#### Hour 3: LLM Flavor Profiling System ✅ COMPLETE
+- [x] Create prompt template for generating vibe tags:
   ```
   "Given this recipe: [ingredients + instructions], 
    generate 5-7 vibe tags that describe the emotional 
@@ -61,26 +61,26 @@ Traditional recipe apps are limited to ingredients. **Vibe Finder** uses "Concep
    'Nostalgic', 'Rainy Day'). Also provide a flavor profile 
    description."
   ```
-- [ ] Implement embedding generation for recipes
-- [ ] Test LLM tagging on 2-3 sample recipes
-- [ ] Store processed recipes in MongoDB
+- [x] Implement embedding generation for recipes
+- [x] Test LLM tagging on 2-3 sample recipes
+- [x] Store processed recipes in MongoDB
 
-#### Hour 4: Basic React UI Setup
-- [ ] Create component structure:
+#### Hour 4: Basic React UI Setup ✅ COMPLETE
+- [x] Create component structure:
   - `SearchBar` - Mood-based search input
   - `RecipeCard` - Display recipe with vibe score
   - `RecipeUpload` - URL/PDF input form
   - `RecipeDetail` - Full recipe view
-- [ ] Build landing page with search interface
-- [ ] Implement simple recipe upload form
-- [ ] Set up routing (Home, Search Results, Recipe Detail)
+- [x] Build landing page with search interface
+- [x] Implement simple recipe upload form
+- [x] Set up routing (Home, Search Results, Recipe Detail)
 
 ---
 
 ### **Day 2: Core Features & Vector Search** (4 hours)
 
-#### Hour 1: Vector Search Implementation
-- [ ] Configure MongoDB Atlas Vector Search index:
+#### Hour 1: Vector Search Implementation ✅ COMPLETE
+- [x] Configure MongoDB Atlas Vector Search index:
   ```javascript
   {
     "mappings": {
@@ -95,16 +95,17 @@ Traditional recipe apps are limited to ingredients. **Vibe Finder** uses "Concep
     }
   }
   ```
-- [ ] Implement mood query → embedding conversion
-- [ ] Build vector similarity search function
-- [ ] Calculate "Vibe Match" score (cosine similarity → percentage)
+- [x] Implement mood query → embedding conversion
+- [x] Build vector similarity search function
+- [x] Calculate "Vibe Match" score (cosine similarity → percentage)
 
-#### Hour 2: Search Results UI & Recipe Cards
-- [ ] Display search results with vibe match scores
-- [ ] Implement visual "Vibe Match" indicator (progress bar/emoji scale)
-- [ ] Show top 3 vibe tags on recipe cards
-- [ ] Add "Why this recipe?" AI-generated explanation
-- [ ] Implement click-through to full recipe detail
+#### Hour 2: Search Results UI & Recipe Cards ✅ COMPLETE
+- [x] Display search results with vibe match scores
+- [x] Implement visual "Vibe Match" indicator (progress bar/emoji scale)
+- [x] Show top 3 vibe tags on recipe cards
+- [x] Add "Why this recipe?" AI-generated explanation
+- [x] Implement click-through to full recipe detail
+- [x] Add search filters (min vibe match, tag filtering)
 
 #### Hour 3: Recipe Detail Page & PDF Processing
 - [ ] Build comprehensive recipe detail view:
@@ -209,17 +210,29 @@ Traditional recipe apps are limited to ingredients. **Vibe Finder** uses "Concep
 ## Getting Started
 
 ```bash
-# Clone and install dependencies
-npm install
+# Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
 
 # Set up environment variables
+cd backend
 cp .env.example .env
-# Add: OPENAI_API_KEY, MONGODB_URI
+# Add: OPENAI_API_KEY, MONGODB_URI (see MONGODB_SETUP.md)
+
+# Create MongoDB Atlas Vector Search index
+# See detailed instructions in MONGODB_SETUP.md
 
 # Run development servers
-npm run dev:frontend  # Port 5173
-npm run dev:backend   # Port 3001
+cd backend && npm run dev    # Port 3001
+cd frontend && npm run dev   # Port 5173
+
+# Optional: Upload test recipes
+cd backend && node src/testRecipes.js
 ```
+
+For detailed setup instructions, see:
+- [MONGODB_SETUP.md](MONGODB_SETUP.md) - MongoDB Atlas & Vector Search configuration
+- [TESTING.md](TESTING.md) - Hour 2 testing checklist
 
 ---
 
