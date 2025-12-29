@@ -63,31 +63,3 @@ export const generateRecipeEmbedding = async (recipe) => {
   const embeddingText = `${recipe.title} ${recipe.ingredients.join(' ')} ${recipe.instructions} ${recipe.vibeTags ? recipe.vibeTags.join(' ') : ''} ${recipe.flavorProfile || ''}`;
   return await generateEmbedding(embeddingText);
 };
-
-export const generateMatchExplanation = async (query, recipe) => {
-  const prompt = `A user searched for: "${query}"
-
-We matched them with this recipe:
-Title: ${recipe.title}
-Vibe Tags: ${recipe.vibeTags.join(', ')}
-Flavor Profile: ${recipe.flavorProfile}
-
-In 1-2 sentences, explain why this recipe is a great match for their search. Be warm, conversational, and specific about the emotional/situational connection.`;
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are a warm, knowledgeable food curator who understands the emotional connections people have with food.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.8,
-      max_tokens: 150
-    });
-
-    return response.choices[0].message.content.trim();
-  } catch (error) {
-    console.error('Error generating explanation:', error);
-    return 'This recipe matches your vibe perfectly!';
-  }
-};
