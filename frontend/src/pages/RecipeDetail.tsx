@@ -82,38 +82,38 @@ export default function RecipeDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 text-primary hover:text-primary/80 font-semibold flex items-center gap-2"
+          className="mb-4 sm:mb-6 text-primary hover:text-primary/80 font-semibold flex items-center gap-2"
         >
           ← Back
         </button>
 
         {/* Recipe Header */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8 mb-4 sm:mb-6">
           {/* Image Placeholder */}
-          <div className="w-full h-64 bg-gradient-to-br from-primary/20 to-accent/30 rounded-lg mb-6 flex items-center justify-center">
+          <div className="w-full h-48 sm:h-64 bg-gradient-to-br from-primary/20 to-accent/30 rounded-lg mb-4 sm:mb-6 flex items-center justify-center">
             <div className="text-center">
-              <svg className="w-20 h-20 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 sm:w-20 h-16 sm:h-20 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <p className="text-gray-500 text-sm">Recipe Image</p>
             </div>
           </div>
 
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">{recipe.title}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">{recipe.title}</h1>
           
           {/* Vibe Tags */}
           <div className="mb-4">
-            <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Vibe Tags</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Vibe Tags</h3>
             <div className="flex flex-wrap gap-2">
               {recipe.vibeTags?.map((tag: string, idx: number) => (
                 <span
                   key={idx}
-                  className="px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 text-gray-800 rounded-full font-medium border border-primary/30"
+                  className="px-3 sm:px-4 py-1 sm:py-2 bg-gradient-to-r from-primary/20 to-accent/20 text-gray-800 rounded-full text-sm sm:text-base font-medium border border-primary/30"
                 >
                   {tag}
                 </span>
@@ -123,22 +123,22 @@ export default function RecipeDetail() {
 
           {/* Flavor Profile */}
           {recipe.flavorProfile && (
-            <div className="bg-primary/5 border-l-4 border-primary p-4 rounded mb-4">
-              <h3 className="font-bold text-gray-800 mb-2">🎨 Flavor Profile</h3>
-              <p className="text-gray-700">{recipe.flavorProfile}</p>
+            <div className="bg-primary/5 border-l-4 border-primary p-3 sm:p-4 rounded mb-4">
+              <h3 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">🎨 Flavor Profile</h3>
+              <p className="text-gray-700 text-sm sm:text-base">{recipe.flavorProfile}</p>
             </div>
           )}
 
           {/* Match Explanation (if came from search) */}
           {recipe.matchExplanation && (
-            <div className="bg-accent/10 border-l-4 border-accent p-4 rounded mb-4">
-              <h3 className="font-bold text-gray-800 mb-2">✨ Why This Match?</h3>
-              <p className="text-gray-700 italic">{recipe.matchExplanation}</p>
+            <div className="bg-accent/10 border-l-4 border-accent p-3 sm:p-4 rounded mb-4">
+              <h3 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">✨ Why This Match?</h3>
+              <p className="text-gray-700 italic text-sm sm:text-base">{recipe.matchExplanation}</p>
             </div>
           )}
 
           {/* Metadata */}
-          <div className="flex items-center gap-4 text-sm text-gray-500 pt-4 border-t">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 pt-4 border-t">
             <span>📅 Added {new Date(recipe.createdAt).toLocaleDateString()}</span>
             {recipe.source && recipe.source !== 'PDF Upload' && (
               <a 
@@ -155,9 +155,9 @@ export default function RecipeDetail() {
         </div>
 
         {/* Ingredients */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            🥘 Ingredients
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8 mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2 flex-wrap">
+            <span>🥘 Ingredients</span>
             <span className="text-sm font-normal text-gray-500">
               ({checkedIngredients.size}/{recipe.ingredients?.length || 0} checked)
             </span>
@@ -176,9 +176,9 @@ export default function RecipeDetail() {
                     type="checkbox" 
                     checked={checkedIngredients.has(idx)}
                     onChange={() => toggleIngredient(idx)}
-                    className="mt-1 mr-3 w-5 h-5 text-primary focus:ring-primary cursor-pointer" 
+                    className="mt-1 mr-3 w-4 h-4 sm:w-5 sm:h-5 text-primary focus:ring-primary cursor-pointer flex-shrink-0" 
                   />
-                  <span className={`text-gray-700 ${checkedIngredients.has(idx) ? 'line-through' : ''}`}>
+                  <span className={`text-gray-700 text-sm sm:text-base ${checkedIngredients.has(idx) ? 'line-through' : ''}`}>
                     {ingredient}
                   </span>
                 </li>
@@ -190,19 +190,19 @@ export default function RecipeDetail() {
         </div>
 
         {/* Instructions */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
             📝 Instructions
           </h2>
           
           {recipe.instructions ? (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {formatInstructions(recipe.instructions).map((step, idx) => (
-                <div key={idx} className="flex gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                <div key={idx} className="flex gap-3 sm:gap-4">
+                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm sm:text-base">
                     {step.step}
                   </div>
-                  <p className="text-gray-700 flex-1 pt-1">{step.text}</p>
+                  <p className="text-gray-700 flex-1 pt-1 text-sm sm:text-base">{step.text}</p>
                 </div>
               ))}
             </div>

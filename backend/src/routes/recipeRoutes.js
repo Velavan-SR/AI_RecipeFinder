@@ -178,4 +178,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/recipes/random - Get a random recipe
+router.get('/random', async (req, res) => {
+  try {
+    const recipes = getRecipesCollection();
+    
+    // Get random recipe using MongoDB aggregation
+    const randomRecipes = await recipes.aggregate([
+      { $sample: { size: 1 } },
+      { $project: { embedding: 0 } } // Exclude embedding
+    ]).toArray();
+    
+    if (randomRecipes.length === 0) {
+      return res.status(404).json({ error: 'No recipes found in database' });
+    }
+
+    res.json(randomRecipes[0]);
+  } catch (error) {
+    console.error('Error fetching random recipe:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

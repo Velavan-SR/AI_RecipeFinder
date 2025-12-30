@@ -67,24 +67,24 @@ export default function SearchResults() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
             Recipe <span className="text-primary">Vibe</span> Finder
           </h1>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <SearchBar onSearch={handleNewSearch} />
         </div>
 
         {/* Query Display */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-700">
-            Searching for: <span className="text-primary italic">"{query}"</span>
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-700">
+            Searching for: <span className="text-primary italic break-words">"{query}"</span>
           </h2>
         </div>
 
@@ -111,11 +111,11 @@ export default function SearchResults() {
               <SearchFilters onFilterChange={handleFilterChange} />
             )}
 
-            <div className="mb-4 text-gray-600">
+            <div className="mb-4 text-gray-600 text-sm sm:text-base">
               Showing {filteredResults.length} of {results.length} vibe matches
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredResults.map((recipe) => (
                 <RecipeCard key={recipe._id} recipe={recipe} />
               ))}
@@ -123,7 +123,7 @@ export default function SearchResults() {
             
             {results.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-xl text-gray-600">
+                <p className="text-lg sm:text-xl text-gray-600">
                   No recipes found. Try adding some recipes first!
                 </p>
                 <button
@@ -137,7 +137,7 @@ export default function SearchResults() {
 
             {filteredResults.length === 0 && results.length > 0 && (
               <div className="text-center py-12">
-                <p className="text-xl text-gray-600">
+                <p className="text-lg sm:text-xl text-gray-600">
                   No recipes match your filters. Try adjusting them!
                 </p>
               </div>
