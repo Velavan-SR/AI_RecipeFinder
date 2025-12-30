@@ -8,6 +8,7 @@ export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchRecipe();
@@ -22,6 +23,38 @@ export default function RecipeDetail() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleIngredient = (index: number) => {
+    const newChecked = new Set(checkedIngredients);
+    if (newChecked.has(index)) {
+      newChecked.delete(index);
+    } else {
+      newChecked.add(index);
+    }
+    setCheckedIngredients(newChecked);
+  };
+
+  const formatInstructions = (instructions: string) => {
+    // Check if instructions are numbered or have steps
+    const lines = instructions.split('\n').filter(line => line.trim());
+    
+    // Check if already numbered
+    const hasNumbers = lines.some(line => /^\d+\./.test(line.trim()));
+    
+    if (hasNumbers) {
+      return lines.map((line, idx) => ({
+        step: idx + 1,
+        text: line.replace(/^\d+\.\s*/, '').trim()
+      }));
+    }
+    
+    // Split by common sentence endings for better step separation
+    const sentences = instructions.match(/[^.!?]+[.!?]+/g) || [instructions];
+    return sentences.map((sentence, idx) => ({
+      step: idx + 1,
+      text: sentence.trim()
+    }));
   };
 
   if (loading) {
@@ -49,7 +82,7 @@ export default function RecipeDetail() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <button
@@ -61,53 +94,121 @@ export default function RecipeDetail() {
 
         {/* Recipe Header */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
+          {/* Image Placeholder */}
+          <div className="w-full h-64 bg-gradient-to-br from-primary/20 to-accent/30 rounded-lg mb-6 flex items-center justify-center">
+            <div className="text-center">
+              <svg className="w-20 h-20 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p className="text-gray-500 text-sm">Recipe Image</p>
+            </div>
+          </div>
+
           <h1 className="text-4xl font-bold text-gray-800 mb-4">{recipe.title}</h1>
           
           {/* Vibe Tags */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {recipe.vibeTags.map((tag: string, idx: number) => (
-              <span
-                key={idx}
-                className="px-4 py-2 bg-accent/30 text-gray-700 rounded-full font-medium"
-              >
-                {tag}
-              </span>
-            ))}
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Vibe Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {recipe.vibeTags?.map((tag: string, idx: number) => (
+                <span
+                  key={idx}
+                  className="px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 text-gray-800 rounded-full font-medium border border-primary/30"
+                >
+                  {tag}
+                </span>
+              )) || <span className="text-gray-500 italic">No vibe tags available</span>}
+            </div>
           </div>
 
           {/* Flavor Profile */}
-          <div className="bg-primary/5 border-l-4 border-primary p-4 rounded mb-6">
-            <h3 className="font-bold text-gray-800 mb-2">Flavor Profile</h3>
-            <p className="text-gray-700">{recipe.flavorProfile}</p>
-          </div>
+          {recipe.flavorProfile && (
+            <div className="bg-primary/5 border-l-4 border-primary p-4 rounded mb-4">
+              <h3 className="font-bold text-gray-800 mb-2">🎨 Flavor Profile</h3>
+              <p className="text-gray-700">{recipe.flavorProfile}</p>
+            </div>
+          )}
 
-          {/* Source */}
-          <p className="text-sm text-gray-500">
-            Source: <a href={recipe.source} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-              {recipe.source}
-            </a>
-          </p>
+          {/* Match Explanation (if came from search) */}
+          {recipe.matchExplanation && (
+            <div className="bg-accent/10 border-l-4 border-accent p-4 rounded mb-4">
+              <h3 className="font-bold text-gray-800 mb-2">✨ Why This Match?</h3>
+              <p className="text-gray-700 italic">{recipe.matchExplanation}</p>
+            </div>
+          )}
+
+          {/* Metadata */}
+          <div className="flex items-center gap-4 text-sm text-gray-500 pt-4 border-t">
+            <span>📅 Added {new Date(recipe.createdAt).toLocaleDateString()}</span>
+            {recipe.source && recipe.source !== 'PDF Upload' && (
+              <a 
+                href={recipe.source} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-primary hover:underline flex items-center gap-1"
+              >
+                🔗 View Source
+              </a>
+            )}
+            {recipe.source === 'PDF Upload' && <span>📄 PDF Upload</span>}
+          </div>
         </div>
 
         {/* Ingredients */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Ingredients</h2>
-          <ul className="space-y-2">
-            {recipe.ingredients.map((ingredient: string, idx: number) => (
-              <li key={idx} className="flex items-start">
-                <input type="checkbox" className="mt-1 mr-3" />
-                <span className="text-gray-700">{ingredient}</span>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            🥘 Ingredients
+            <span className="text-sm font-normal text-gray-500">
+              ({checkedIngredients.size}/{recipe.ingredients?.length || 0} checked)
+            </span>
+          </h2>
+          
+          {recipe.ingredients && recipe.ingredients.length > 0 ? (
+            <ul className="space-y-3">
+              {recipe.ingredients.map((ingredient: string, idx: number) => (
+                <li 
+                  key={idx} 
+                  className={`flex items-start p-2 rounded hover:bg-gray-50 transition-colors ${
+                    checkedIngredients.has(idx) ? 'opacity-50' : ''
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={checkedIngredients.has(idx)}
+                    onChange={() => toggleIngredient(idx)}
+                    className="mt-1 mr-3 w-5 h-5 text-primary focus:ring-primary cursor-pointer" 
+                  />
+                  <span className={`text-gray-700 ${checkedIngredients.has(idx) ? 'line-through' : ''}`}>
+                    {ingredient}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 italic">No ingredients listed</p>
+          )}
         </div>
 
         {/* Instructions */}
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Instructions</h2>
-          <div className="prose max-w-none">
-            <p className="text-gray-700 whitespace-pre-wrap">{recipe.instructions}</p>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            📝 Instructions
+          </h2>
+          
+          {recipe.instructions ? (
+            <div className="space-y-6">
+              {formatInstructions(recipe.instructions).map((step, idx) => (
+                <div key={idx} className="flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                    {step.step}
+                  </div>
+                  <p className="text-gray-700 flex-1 pt-1">{step.text}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 italic">No instructions available</p>
+          )}
         </div>
       </div>
     </div>

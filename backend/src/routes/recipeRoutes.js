@@ -11,41 +11,96 @@ router.post('/scrape', async (req, res) => {
   try {
     const { url, pdfBuffer } = req.body;
     
+    if (!url && !pdfBuffer) {
+      return res.status(400).json({ 
+        error: 'URL or PDF required',
+        details: 'Please provide either a URL or PDF file to upload'
+      });
+    }
+
     let recipeData;
     
     if (url) {
       console.log('📥 Scraping recipe from URL:', url);
-      recipeData = await scrapeRecipeFromURL(url);
+      try {
+        recipeData = await scrapeRecipeFromURL(url);
+      } catch (scrapeError) {
+        return res.status(400).json({ 
+          error: 'Failed to scrape recipe from URL',
+          details: scrapeError.message
+        });
+      }
     } else if (pdfBuffer) {
       console.log('📄 Extracting recipe from PDF');
-      const buffer = Buffer.from(pdfBuffer, 'base64');
-      recipeData = await extractRecipeFromPDF(buffer);
-    } else {
-      return res.status(400).json({ error: 'URL or PDF required' });
+      try {
+        const buffer = Buffer.from(pdfBuffer, 'base64');
+        recipeData = await extractRecipeFromPDF(buffer);
+      } catch (pdfError) {
+        return res.status(400).json({ 
+          error: 'Failed to extract recipe from PDF',
+          details: pdfError.message
+        });
+      }
+    }
+
+    // Validate recipe data
+    if (!recipeData.title || !recipeData.ingredients || !recipeData.instructions) {
+      return res.status(400).json({ 
+        error: 'Incomplete recipe data',
+        details: 'Recipe must have title, ingredients, and instructions'
+      });
     }
 
     // Generate vibe tags and flavor profile
     console.log('🎨 Generating vibe tags...');
-    const { vibeTags, flavorProfile } = await generateVibeTags(recipeData);
-    
-    recipeData.vibeTags = vibeTags;
-    recipeData.flavorProfile = flavorProfile;
+    try {
+      const { vibeTags, flavorProfile } = await generateVibeTags(recipeData);
+      recipeData.vibeTags = vibeTags || [];
+      recipeData.flavorProfile = flavorProfile || 'No flavor profile available';
+    } catch (tagError) {
+      console.error('Failed to generate vibe tags:', tagError);
+      // Continue with default values
+      recipeData.vibeTags = ['Uncategorized'];
+      recipeData.flavorProfile = 'Unable to generate flavor profile';
+    }
 
     // Generate embedding
     console.log('🔢 Generating embedding...');
-    recipeData.embedding = await generateRecipeEmbedding(recipeData);
+    try {
+      recipeData.embedding = await generateRecipeEmbedding(recipeData);
+    } catch (embeddingError) {
+      console.error('Failed to generate embedding:', embeddingError);
+      return res.status(500).json({ 
+        error: 'Failed to generate recipe embedding',
+        details: 'OpenAI API may be unavailable. Please check your API key and try again.'
+      });
+    }
 
     // Save to database
-    const result = await createRecipe(recipeData);
-    
-    res.json({
-      success: true,
-      recipeId: result.insertedId,
-      recipe: recipeData
-    });
+    try {
+      const result = await createRecipe(recipeData);
+      
+      // Remove embedding from response (too large)
+      delete recipeData.embedding;
+      
+      res.json({
+        success: true,
+        recipeId: result.insertedId,
+        recipe: recipeData
+      });
+    } catch (dbError) {
+      console.error('Failed to save recipe:', dbError);
+      return res.status(500).json({ 
+        error: 'Failed to save recipe to database',
+        details: dbError.message
+      });
+    }
   } catch (error) {
     console.error('Error processing recipe:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      error: 'Unexpected error processing recipe',
+      details: error.message 
+    });
   }
 });
 
