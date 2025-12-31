@@ -8,6 +8,10 @@ export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showSubstitute, setShowSubstitute] = useState(false);
+  const [selectedIngredient, setSelectedIngredient] = useState('');
+  const [substitute, setSubstitute] = useState<any>(null);
+  const [substituteLoading, setSubstituteLoading] = useState(false);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -22,6 +26,22 @@ export default function RecipeDetail() {
       setError(err.response?.data?.error || 'Failed to load recipe');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFindSubstitute = async (ingredient: string) => {
+    setSelectedIngredient(ingredient);
+    setSubstituteLoading(true);
+    setSubstitute(null);
+    setShowSubstitute(true);
+
+    try {
+      const response = await axios.post(`/api/recipes/${id}/substitute`, { ingredient });
+      setSubstitute(response.data);
+    } catch (err: any) {
+      setSubstitute({ error: 'Failed to find substitute. Make sure you have similar recipes in the database!' });
+    } finally {
+      setSubstituteLoading(false);
     }
   };
 
@@ -156,31 +176,38 @@ export default function RecipeDetail() {
 
         {/* Ingredients */}
         <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8 mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2 flex-wrap">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2 flex-wrap">
             <span>🥘 Ingredients</span>
             <span className="text-sm font-normal text-gray-500">
               ({checkedIngredients.size}/{recipe.ingredients?.length || 0} checked)
             </span>
           </h2>
+          <p className="text-sm text-gray-500 mb-4">💡 Hover over an ingredient to find substitutes</p>
           
           {recipe.ingredients && recipe.ingredients.length > 0 ? (
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {recipe.ingredients.map((ingredient: string, idx: number) => (
                 <li 
                   key={idx} 
-                  className={`flex items-start p-2 rounded hover:bg-gray-50 transition-colors ${
-                    checkedIngredients.has(idx) ? 'opacity-50' : ''
-                  }`}
+                  className="flex items-start justify-between group p-2 rounded hover:bg-gray-50 transition-colors"
                 >
-                  <input 
-                    type="checkbox" 
-                    checked={checkedIngredients.has(idx)}
-                    onChange={() => toggleIngredient(idx)}
-                    className="mt-1 mr-3 w-4 h-4 sm:w-5 sm:h-5 text-primary focus:ring-primary cursor-pointer flex-shrink-0" 
-                  />
-                  <span className={`text-gray-700 text-sm sm:text-base ${checkedIngredients.has(idx) ? 'line-through' : ''}`}>
-                    {ingredient}
-                  </span>
+                  <div className="flex items-start flex-1">
+                    <input 
+                      type="checkbox" 
+                      checked={checkedIngredients.has(idx)}
+                      onChange={() => toggleIngredient(idx)}
+                      className="mt-1 mr-3 w-4 h-4 text-primary focus:ring-primary cursor-pointer flex-shrink-0" 
+                    />
+                    <span className={`text-gray-700 text-sm sm:text-base ${checkedIngredients.has(idx) ? 'line-through' : ''}`}>
+                      {ingredient}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleFindSubstitute(ingredient)}
+                    className="ml-4 px-3 py-1 text-sm text-primary opacity-0 group-hover:opacity-100 hover:bg-primary/10 rounded transition-all whitespace-nowrap"
+                  >
+                    Find Substitute
+                  </button>
                 </li>
               ))}
             </ul>
@@ -211,6 +238,76 @@ export default function RecipeDetail() {
           )}
         </div>
       </div>
+
+      {/* Substitute Modal */}
+      {showSubstitute && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full relative">
+            <button
+              onClick={() => {
+                setShowSubstitute(false);
+                setSubstitute(null);
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+              Find Substitute
+            </h3>
+
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-2">Missing ingredient:</p>
+              <p className="text-base font-semibold text-gray-700">{selectedIngredient}</p>
+            </div>
+
+            {substituteLoading ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                <p className="text-gray-500">Searching similar recipes...</p>
+              </div>
+            ) : substitute ? (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="text-lg font-bold text-primary">{substitute.substitute}</p>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        substitute.confidence === 'high'
+                          ? 'bg-green-100 text-green-700'
+                          : substitute.confidence === 'medium'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {substitute.confidence} confidence
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">{substitute.reason}</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-xs font-semibold text-gray-700 mb-2">💡 Why this substitute?</p>
+                  <p className="text-sm text-gray-600">{substitute.explanation || substitute.reason}</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setShowSubstitute(false);
+                    setSubstitute(null);
+                  }}
+                  className="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Got it!
+                </button>
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 py-8">No substitute found</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

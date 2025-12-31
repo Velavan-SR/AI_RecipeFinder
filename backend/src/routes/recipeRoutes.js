@@ -2,8 +2,8 @@ import express from 'express';
 import { scrapeRecipeFromURL, extractRecipeFromPDF } from '../services/scraperService.js';
 import { generateVibeTags, generateRecipeEmbedding, generateMatchExplanation } from '../services/openaiService.js';
 import { createRecipe, findRecipeById, vectorSearch, getRecipesCollection } from '../models/Recipe.js';
-import { generateEmbedding } from '../services/openaiService.js';
-
+import { generateEmbedding } from '../services/openaiService.js';import { findSubstitute } from '../services/substituteService.js';
+import { ObjectId } from 'mongodb';
 const router = express.Router();
 
 // POST /api/recipes/scrape - Handle URL/PDF input
@@ -196,6 +196,24 @@ router.get('/random', async (req, res) => {
     res.json(randomRecipes[0]);
   } catch (error) {
     console.error('Error fetching random recipe:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/recipes/:id/substitute - Find ingredient substitute
+router.post('/:id/substitute', async (req, res) => {
+  try {
+    const { ingredient } = req.body;
+    
+    if (!ingredient) {
+      return res.status(400).json({ error: 'Ingredient required' });
+    }
+
+    console.log(`🔄 Finding substitute for "${ingredient}" in recipe ${req.params.id}`);
+    const result = await findSubstitute(new ObjectId(req.params.id), ingredient);
+    res.json(result);
+  } catch (error) {
+    console.error('Error finding substitute:', error);
     res.status(500).json({ error: error.message });
   }
 });
