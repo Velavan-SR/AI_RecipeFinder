@@ -2,8 +2,11 @@ import express from 'express';
 import { scrapeRecipeFromURL, extractRecipeFromPDF } from '../services/scraperService.js';
 import { generateVibeTags, generateRecipeEmbedding, generateMatchExplanation } from '../services/openaiService.js';
 import { createRecipe, findRecipeById, vectorSearch, getRecipesCollection } from '../models/Recipe.js';
-import { generateEmbedding } from '../services/openaiService.js';import { findSubstitute } from '../services/substituteService.js';
+import { generateEmbedding } from '../services/openaiService.js';
+import { findSubstitute } from '../services/substituteService.js';
+import { generateMealPlan } from '../services/mealPlannerService.js';
 import { ObjectId } from 'mongodb';
+
 const router = express.Router();
 
 // POST /api/recipes/scrape - Handle URL/PDF input
@@ -214,6 +217,24 @@ router.post('/:id/substitute', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Error finding substitute:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/recipes/meal-planner - Generate 3-course meal plan
+router.post('/meal-planner', async (req, res) => {
+  try {
+    const { mood } = req.body;
+    
+    if (!mood) {
+      return res.status(400).json({ error: 'Mood or vibe query required' });
+    }
+
+    console.log(`🍽️ Generating meal plan for mood: "${mood}"`);
+    const mealPlan = await generateMealPlan(mood);
+    res.json(mealPlan);
+  } catch (error) {
+    console.error('Error generating meal plan:', error);
     res.status(500).json({ error: error.message });
   }
 });

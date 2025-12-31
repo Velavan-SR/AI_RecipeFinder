@@ -66,6 +66,18 @@ export default function Home() {
           <p className="text-sm text-gray-500 mt-2">Get a random recipe from your collection</p>
         </div>
 
+        {/* Meal Planner Button */}
+        <div className="text-center mb-8">
+          <button
+            onClick={() => navigate('/meal-planner')}
+            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-secondary to-primary text-white rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+          >
+            <span className="text-2xl">🍽️</span>
+            Plan a 3-Course Meal
+          </button>
+          <p className="text-sm text-gray-500 mt-2">Let AI create a perfectly balanced dinner</p>
+        </div>
+
         {/* Toggle Upload */}
         <div className="text-center mb-8">
           <button
